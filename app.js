@@ -31,6 +31,8 @@ app.get('/', routes.index);
 app.get('/users', user.list);
 
 app.post('/email/sqs', email.sendsqs);
+app.post('/email/sns', email.sendsns);
+app.post('/email', email.sendnode);
 
 app.put('/users', user.add);
 
