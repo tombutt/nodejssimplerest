@@ -5,21 +5,23 @@ var AWS = require('aws-sdk');
 AWS.config.loadFromPath('/usr/local/node/nodejssimplerest/creds.json');
 
 exports.sendses = function(req,res){
-	res.send("this will send via SES");
 	var ses = new AWS.SES();
 	ses.sendEmail({
 //JSON PARAMS
 	"Source":"info@cheekyware.com",
 	"Destination":{"ToAddresses":["info@cheekyware.com"]
 		},
-	"Message":{"Subject":{"Data":"SES message"},
+	"Message":{"Subject":{"Data":"SES"},
 	"Body":{"Text":{"Data":JSON.stringify(req.body)}}
 		}
 	}, function(err,data){
 		if (err){
 			console.log("ERR: "+err);
+			res.send("Unable to send email, sorry for the inconvenience");
+		} else {
+			console.log(req.body);
+			res.redirect(302, req.body.redirect);
 		}
-//RESULT FUNCTION
 	});
 }
 exports.sendsqs = function(req, res){
@@ -27,14 +29,19 @@ exports.sendsqs = function(req, res){
 };
 
 exports.sendsns = function(req, res){
-	res.send("this will send an sns");
+	console.log("in SNS");
 	var sns = new AWS.SNS();
 	sns.publish({
 		"TopicArn":"arn:aws:sns:us-east-1:047247006121:nodeemail",
-		"Message":JSON.stringify(req.body)
+		"Subject":req.body.subject,
+		"Message":"From:"+req.body.email+"Body:"+req.body.body
 	}, function(err,data){
 		if (err){
 			console.log("ERR: "+err);
+			res.send("Unable to send email, sorry for the inconvenience");
+		} else {
+			console.log(req.body);
+			res.redirect(302, req.body.redirect);
 		}
 	});
 };
